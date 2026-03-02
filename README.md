@@ -8,6 +8,7 @@ This is my MS Capstone project.
 
 ## Project Structure
 
+```
 ├── DDOS-detection-Capstone-EDA.ipynb
 ├── DDOS-detection-Capstone-Preprocessing.ipynb
 ├── DDOS-detection-Capstone-Feature-Engineering.ipynb
@@ -16,7 +17,7 @@ This is my MS Capstone project.
 ├── data/
 ├── models/
 └── outputs/
-
+```
 
 ---
 
