@@ -14,9 +14,9 @@ This is my MS Capstone project.
 ├── DDOS-detection-Capstone-Feature-Engineering.ipynb
 ├── DDOS-detection-Capstone-Modelling.ipynb
 ├── DDOS-detection-Capstone-SHAP.ipynb
-├── data/
-├── models/
-└── outputs/
+├── data/# Parquet files (training & testing splits per attack type)
+├── models/# Saved trained models
+└── outputs/# All visualizations, rules, and results
 ```
 
 ---
