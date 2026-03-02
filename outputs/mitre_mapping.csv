@@ -1,0 +1,11 @@
+Feature,Tactic,Technique,Why
+Packet Length Min,Impact,T1498 - Network DoS,Uniform small packets = flood signature
+Fwd Packet Length Min,Impact,T1498 - Network DoS,Forward flood pattern
+Avg Packet Size,Impact,T1498.001 - Direct Network Flood,Abnormal avg size indicates volumetric attack
+Avg Fwd Segment Size,Impact,T1498.001 - Direct Network Flood,Segment size anomaly in forward direction
+Fwd Packet Length Mean,Reconnaissance,T1595 - Active Scanning,Consistent payload size = scanning/probing
+Packet Length Mean,Impact,T1498 - Network DoS,Mean packet size deviation from baseline
+Fwd Packet Length Max,Impact,T1499 - Endpoint DoS,Large max fwd packets = application layer stress
+Protocol,Impact,T1498.002 - Reflection Amplification,LDAP/UDP protocol abuse for amplification
+Flow Bytes/s,Impact,T1498 - Network DoS,High bytes/s = volumetric flood indicator
+Packet Length Max,Impact,T1498.001 - Direct Network Flood,Max packet size spike = burst flood

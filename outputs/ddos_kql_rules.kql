@@ -1,0 +1,66 @@
+
+// ============================================================
+// RULE 1: Volumetric DDoS — Packet Flood Detection
+// MITRE: T1498 - Network DoS | Tactic: Impact
+// ============================================================
+// Elastic SIEM / Microsoft Sentinel (KQL)
+
+NetworkFlow
+| where TimeGenerated > ago(5m)
+| where Protocol in ("UDP", "LDAP")
+| summarize
+    AvgPacketSize     = avg(PacketLengthMean),
+    MinPacketLen      = min(PacketLengthMin),
+    TotalFlowBytes    = sum(FlowBytesPerSec),
+    FlowCount         = count()
+  by SrcIP, bin(TimeGenerated, 1m)
+| where MinPacketLen < 50                  // uniform small packets = flood
+| where TotalFlowBytes > 1000000           // >1MB/s per source
+| where FlowCount > 500                    // high flow rate
+| project TimeGenerated, SrcIP, MinPacketLen, TotalFlowBytes, FlowCount
+| extend
+    MitreTechnique = "T1498 - Network DoS",
+    Severity       = "High",
+    Description    = "Potential volumetric DDoS flood detected from source IP"
+
+// ============================================================
+// RULE 2: Application Layer DDoS — Forward Segment Anomaly
+// MITRE: T1499 - Endpoint DoS | Tactic: Impact
+// ============================================================
+
+NetworkFlow
+| where TimeGenerated > ago(5m)
+| summarize
+    AvgFwdSegment   = avg(AvgFwdSegmentSize),
+    FwdPacketMean   = avg(FwdPacketLengthMean),
+    FlowCount       = count()
+  by SrcIP, DstIP, bin(TimeGenerated, 1m)
+| where AvgFwdSegment < 100                // abnormally small segments
+| where FwdPacketMean < 80                 // consistent low payload = app layer flood
+| where FlowCount > 300
+| project TimeGenerated, SrcIP, DstIP, AvgFwdSegment, FwdPacketMean, FlowCount
+| extend
+    MitreTechnique = "T1499 - Endpoint DoS",
+    Severity       = "High",
+    Description    = "Application-layer DDoS pattern detected — forward segment anomaly"
+
+// ============================================================
+// RULE 3: Reflection/Amplification Attack — Protocol Abuse
+// MITRE: T1498.002 - Reflection Amplification | Tactic: Impact
+// ============================================================
+
+NetworkFlow
+| where TimeGenerated > ago(5m)
+| where Protocol in ("UDP", "LDAP", "NetBIOS")
+| summarize
+    AvgPacketSize   = avg(AvgPacketSize),
+    TotalBytes      = sum(FlowBytesPerSec),
+    UniqueDestIPs   = dcount(DstIP)
+  by SrcIP, Protocol, bin(TimeGenerated, 1m)
+| where TotalBytes > 500000                // high outbound volume
+| where UniqueDestIPs < 3                  // targeting few destinations = amplification
+| project TimeGenerated, SrcIP, Protocol, TotalBytes, UniqueDestIPs
+| extend
+    MitreTechnique = "T1498.002 - Reflection Amplification",
+    Severity       = "Critical",
+    Description    = "Possible reflection/amplification DDoS via protocol abuse"

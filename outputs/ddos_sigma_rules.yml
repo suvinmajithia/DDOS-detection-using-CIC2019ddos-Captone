@@ -1,0 +1,36 @@
+
+title: DDoS Attack Detection via Packet Length Anomaly
+status: experimental
+description: Detects volumetric DDoS attacks using packet length and flow rate features
+references:
+    - https://attack.mitre.org/techniques/T1498/
+author: Suvin Majithia
+date: 2026/02/28
+tags:
+    - attack.impact
+    - attack.t1498
+    - attack.t1498.001
+    - attack.t1498.002
+detection:
+    condition: all of them
+    keywords:
+        - Packet Length Min < baseline_threshold
+        - Flow Bytes/s > volumetric_threshold
+        - Protocol in [UDP, LDAP]
+falsepositives:
+    - Legitimate high-volume UDP traffic
+    - CDN burst traffic
+level: high
+---
+title: Application Layer DDoS — Forward Segment Anomaly
+status: experimental
+description: Detects application-layer DDoS via forward packet segment size anomalies
+tags:
+    - attack.impact
+    - attack.t1499
+detection:
+    condition: all of them
+    keywords:
+        - Avg Fwd Segment Size deviates > 2 std from baseline
+        - Fwd Packet Length Mean consistently low
+level: high
